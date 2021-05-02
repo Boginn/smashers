@@ -1,29 +1,35 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row v-if="!$parent.outOfCombat">
       <v-col>
         <v-btn
           block
+          height="70"
           @click="attack"
           :disabled="$parent.lockMove"
-          class="red white--text"
+          v-bind:class="{ disbld: $parent.lockMove }"
+          class="redgradient yellow--text fontshadow"
           >attack</v-btn
         >
-        &nbsp;
+      </v-col>
+      <v-col>
         <v-btn
           block
+          height="70"
           @click="defend"
           :disabled="$parent.lockMove"
-          class="green white--text"
+          v-bind:class="{ disbld: $parent.lockMove }"
+          class="bluegradient yellow--text fontshadow"
           >defend</v-btn
         >
       </v-col>
     </v-row>
     <br />
     <v-card v-if="!gameOver">
-      <v-card-text class="toon-bg white--text pa-10">
+      <v-card-text class="toon-bg grey--text pa-10">
         <v-row style="height: 75px;">
           <v-progress-linear
+            height="15"
             v-model="progressHp"
             :buffer-value="progressMaxHp"
             color="green"
@@ -32,7 +38,7 @@
 
           <br />
 
-          <h1 style="height: 50px;" class="blue--text">
+          <h1 style="height: 50px;" class="toon-title fontshadow">
             Lv.{{ toon.level }} {{ toon.name }}
             <span style="font-size: 10pt;" v-if="equip"
               >in <span style="font-size: 14pt;">{{ equip.name }}</span></span
@@ -40,11 +46,25 @@
           </h1>
 
           <v-spacer></v-spacer>
-          <span v-if="toon.status.defending"
+          <span v-if="toon.defending"
             ><img
               style="float: right; display: inline-block; overflow: auto;"
               height="50px"
               src="../assets/shield.png"
+              alt=""
+          /></span>
+          <span v-if="toon.lust"
+            ><img
+              style="float: right; display: inline-block; overflow: auto;"
+              height="50px"
+              src="../assets/lust.png"
+              alt=""
+          /></span>
+          <span v-if="toon.sacrifice"
+            ><img
+              style="float: right; display: inline-block; overflow: auto;"
+              height="50px"
+              src="../assets/sacrifice.png"
               alt=""
           /></span>
         </v-row>
@@ -79,15 +99,28 @@
                   {{ toon.hp }}
                 </span>
               </h2>
-              <h2>AP: {{ attackPower }} + {{ toon.selectedWeapon.ap }}</h2>
-              <h2>AC: {{ armorClass }}</h2>
+              <h2>
+                AP: <span class="red--text"> {{ attackPower }}</span> +
+                <span class="red--text">{{ toon.selectedWeapon.ap }}</span>
+              </h2>
+              <h2>
+                AC: <span class="cyan--text">{{ armorClass }}</span>
+              </h2>
             </v-col>
 
             <v-col cols="auto">
-              <div>Strength: {{ toon.strength }}</div>
-              <div>Dexterity: {{ toon.dexterity }}</div>
-              <div>Vigor: {{ toon.vigor }}</div>
-              <div>Willpower: {{ toon.willpower }}</div>
+              <h3>
+                Strength: <span class="orange--text"> {{ toon.strength }}</span>
+              </h3>
+              <h3>
+                Dexterity:<span class="lime--text"> {{ toon.dexterity }}</span>
+              </h3>
+              <h3>
+                Vigor: <span class="red--text"> {{ toon.vigor }}</span>
+              </h3>
+              <h3>
+                Willpower: <span class="blue--text"> {{ toon.willpower }}</span>
+              </h3>
             </v-col>
             <v-col cols="auto">
               <div>
@@ -143,7 +176,12 @@
             </v-col>
 
             <v-col>
-              <h2>Gold: {{ toon.gold }}</h2>
+              <h2>
+                Gold: <span class="yellow--text">{{ toon.gold }}</span>
+              </h2>
+              <h2>
+                XP: <span class="blue--text">{{ toon.xp }}</span>
+              </h2>
             </v-col>
           </v-row>
           <v-row>
@@ -157,11 +195,9 @@
         </v-container>
       </v-card-text>
     </v-card>
-        <v-card v-else>
+    <v-card v-else>
       <v-card-text class="toon-bg white--text pa-10">
-
-          <h1 style="text-align: center">You died</h1>
-
+        <h1 style="text-align: center">You died</h1>
       </v-card-text>
     </v-card>
   </v-container>
@@ -179,6 +215,7 @@ export default {
     inventory: Array,
     equip: Object,
     gameOver: Boolean,
+    ogrePushing: Number,
   },
   data: function() {
     return {};
@@ -195,21 +232,33 @@ export default {
       return this.toon.dexterity * 1.5 + armor;
     },
     attackPower() {
-      return Math.floor(this.toon.strength + this.toon.dexterity / 2) + Math.floor(this.toon.level*1.5);
+      return (
+        Math.floor(this.toon.strength + this.toon.dexterity / 2) +
+        Math.floor(this.toon.level * 1.5)
+      );
     },
     progressHp() {
-      return this.toon.hp / 2;
+      if (this.maxHealth >= 100) {
+          return this.toon.hp / 2;
+      } else if (this.maxHealth >= 200) {
+          return this.toon.hp / 3;
+
+      }
+      return this.toon.hp;
     },
     progressMaxHp() {
-      return this.maxHealth / 2;
+      if (this.maxHealth >= 100) {
+        return this.maxHealth / 2;
+      } else if (this.maxHealth >= 200) {
+          return this.maxHealth / 3;
+
+      }
+      return this.maxHealth;
     },
   },
   methods: {
     attack() {
-      if (!this.$parent.encounter.length) {
-        return;
-      }
-      this.toon.status.defending = false;
+      this.toon.defending = false;
 
       // Roll damage and add weapon damage
       let damage = this.$parent.rollDamage(this.toon.ap),
@@ -230,21 +279,20 @@ export default {
 
       // check if final battle, willpower and vigor go a long way when fighting a dragon
       if (this.$parent.finalBattle) {
-        damage += Math.floor(this.toon.willpower * 1.5) + Math.floor(this.toon.vigor * 1.5);
+        damage +=
+          Math.floor(this.toon.willpower * 0.8) +
+          Math.floor(this.toon.vigor * 0.8);
       }
 
       // add bloodlust damage
-      if(this.toon.status.lust) {
-          damage+=this.$parent.stage*5;
+      if (this.toon.lust) {
+        damage += this.$parent.stage * 5;
       }
 
       this.$emit("action", damage);
     },
     defend() {
-      if (!this.$parent.encounter.length) {
-        return;
-      }
-      this.toon.status.defending = true;
+      this.toon.defending = true;
 
       // heal
       let roll = this.toon.willpower + this.$parent.rollDamage(this.toon.vigor);
@@ -257,13 +305,18 @@ export default {
       }
 
       // negate special attacks
-      if (this.$parent.specialActions.pushOff > 1) {
-        this.$parent.specialActions.pushOff -= 1;
+      if (this.$parent.ogrePushing >= 1) {
+        this.$parent.ogrePushing -= 1;
+        this.$parent.combatLog.push(`${this.toon.name} steadies!`);
+      }
+      if (this.$parent.dragonPushing >= 1) {
+        this.$parent.dragonPushing -= 1;
         this.$parent.combatLog.push(`${this.toon.name} steadies!`);
       }
 
       this.$emit("action", false);
     },
+
     spendPoint(attribute) {
       this.toon.points -= 1;
       return (attribute += 1);
@@ -316,4 +369,34 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.toon-bg {
+  background-color: rgb(0, 110, 86);
+  background: linear-gradient(
+    180deg,
+    rgb(0, 55, 86, 0.95) 0%,
+    rgba(0, 80, 85, 0.9) 75%
+  );
+}
+.toon-title {
+  color: goldenrod;
+}
+.redgradient {
+  background: linear-gradient(
+    120deg,
+    rgba(202, 189, 3, 0.95) -60%,
+    rgba(196, 54, 54, 0.95) 30%
+  );
+}
+.bluegradient {
+  background: linear-gradient(
+    105deg,
+    rgba(196, 54, 54, 0.95) 20%,
+    rgba(3, 39, 107, 0.9) 75%
+  );
+}
+.disbld {
+  background: grey;
+  font-size: 0;
+}
+</style>

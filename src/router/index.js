@@ -1,20 +1,21 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import GameMain from '../views/GameMain.vue'
-import GameChar from '../components/GameChar.vue'
+import Game from '../views/Game.vue'
+import Welcome from '../views/Welcome.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    name: 'GameMain',
-    component: GameMain
+    path: '/Game',
+    name: 'Game',
+    component: Game,
+
   },
   {
-    path: '/Char',
-    name: 'Char',
-    component: GameChar
+    path: '/Welcome',
+    name: 'Welcome',
+    component: Welcome
   },
   // {
     // path: '/about',
@@ -27,6 +28,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
+  mode: "history",
   routes
 })
 

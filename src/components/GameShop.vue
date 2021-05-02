@@ -49,11 +49,11 @@ export default {
   data() {
     return {
       weapons: [
-        {name: "Club", ap: 15, uses: 20, maxUses: 20, cost: 50 },
-        {name: "Crossbow", ap: 20, uses: 10, maxUses: 10, cost: 125 },
+        {name: "Club", ap: 15, uses: 12, maxUses: 12, cost: 50 },
+        {name: "Crossbow", ap: 20, uses: 8, maxUses: 8, cost: 125 },
         {name: "Falchion", ap: 35, uses: 3, maxUses: 3, cost: 225 },
         {name: "Halberd", ap: 45, uses: 3, maxUses: 3, cost: 300 },
-        {name: "Death Star", ap: 200, uses: 1, maxUses: 2, cost: 1500 },
+        {name: "Death Star", ap: 99, uses: 1, maxUses: 2, cost: 1500 },
       ],
       armor: [
         {name: "Loincloth", ac: 5, cost: 15 },
@@ -90,7 +90,7 @@ export default {
     },
     buyItem(i) {
               if(i.cost <= this.toonGold) {
-                this.$emit("boughtHealth", i);
+                this.$emit("boughtItem", i);
        
               }  else {
         this.$emit('displayText', "You don't have enough gold!");

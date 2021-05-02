@@ -3,10 +3,11 @@
     <v-card>
       <v-card-text
         class="d-flex justify-center text-bg white--text"
-        :class="bgMessage"
+        :class="textColor"
         style="min-height: 70px"
       >
-        <h3 v-if="text">{{ text }}</h3>
+        <h3 v-html="text" v-if="text"></h3>
+        <h3 v-if="text == '' && outOfCombat">{{ defaultMessage }}</h3>
       </v-card-text>
     </v-card>
     <br />
@@ -15,10 +16,10 @@
       <div v-if="combatLog && !outOfCombat" class="combatlog-bg white--text">
         <div
           id="log-entry"
-          v-for="(e, i) in combatLog.slice().reverse()"
+          v-for="(entry, i) in combatLog.slice().reverse()"
           v-bind:key="i"
         >
-          <span>{{ e }}</span>
+          <span v-html="entry"></span>
         </div>
       </div>
 
@@ -84,7 +85,7 @@ export default {
     GameShop,
   },
   props: {
-    bgMessage: String,
+    textColor: String,
     text: String,
     combatLog: Array,
     outOfCombat: Boolean,
@@ -93,6 +94,7 @@ export default {
   data() {
     return {
       isShop: false,
+      defaultMessage: 'Shop, continue... or explore?',
     };
   },
   methods: {
@@ -125,13 +127,13 @@ export default {
         this.$parent.toon.gold -= i.cost;
         this.$parent.displayText = `Healed for ${roll}!`;
       } else if (i.name == "Ring of Sacrifice") {
-          this.$parent.toon.status.sacrifice = true;
+          this.$parent.toon.sacrifice = true;
           this.$parent.toon.gold -= i.cost;
           this.$parent.displayText = `Equipped the ${i.name}!`;
       } else if (i.name == "Bloodlust") {
-          this.$parent.toon.status.lust = true;
+          this.$parent.toon.lust = true;
           this.$parent.toon.gold -= i.cost;
-          this.$parent.displayText = `Filled with ${i.name}!`;
+          this.$parent.displayText = `Filled with ${i.name} for one round!`;
       }
     },
     shopText(text) {
@@ -141,13 +143,28 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .combat-log {
   overflow: hidden;
 }
+.combatlog-bg {
+  /* background-color: rgb(22, 92, 138); */
+    background: linear-gradient(90deg, rgba(32, 48, 87, 0.95) 0%, rgba(8, 55, 63, 0.95) 24%, rgba(9, 121, 35, 0.95) 66%);
+
+}
 #log-entry {
   padding: 3px;
+  text-align: end;
 
   border: 1px dotted black;
 }
+.text-bg {
+  background-color: rgba(102, 128, 163, 0.774);
+}
+  .defend-bg {
+    background-color: rgba(49, 91, 146, 0.877);
+  }
+  .attack-bg {
+    background-color: rgba(168, 103, 50, 0.95);
+  }
 </style>

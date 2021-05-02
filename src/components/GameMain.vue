@@ -6,7 +6,7 @@
 
     <v-row>
       <v-col v-for="m in encounter" v-bind:key="m.id">
-        <monster :monster="m" :bgActive="bgActive"></monster>
+        <monster :monster="m"></monster>
       </v-col>
 
       <v-spacer v-if="encounter.length == 1 && !finalBattle"></v-spacer>
@@ -15,7 +15,7 @@
     <v-row>
       <v-col>
         <game-stage
-          :bgMessage="bgMessage"
+          :textColor="displayTextColor"
           :text="displayText"
           :combatLog="combatLog"
           :outOfCombat="outOfCombat"
@@ -26,11 +26,10 @@
       </v-col>
       <v-col>
         <div
+          :style="`top: ${ogrePushCurve}%; top: ${dragonPushCurve}%; right: ${dragonPushCurve}%`"
           v-bind:class="{
-            transitionPush: specialActions.pushOff == 1,
-            transitionPush2: specialActions.pushOff == 2,
-            transitionPush3: specialActions.pushOff == 3,
-            transitionPush4: specialActions.pushOff == 4,
+            pushable: ogrePushing || dragonPushing,
+
           }"
         >
           <game-char
@@ -39,6 +38,7 @@
             :equip="equip"
             :inventory="inventory"
             :gameOver="gameOver"
+            :ogrePushing="ogrePushing"
             @action="gameRound"
             @lockMove="lockMove = true"
           ></game-char>
@@ -48,9 +48,14 @@
     <v-row v-for="e in 100" v-bind:key="e">
       <br />
     </v-row>
-    <v-row v-if="isSecret" class="white--text">
+    <v-row v-if="isSecretClub && stage<=6" class="white--text">
       {{ secretMessage }} <v-spacer></v-spacer
       ><v-btn small outlined @click="secretClub">Club</v-btn
+      ><v-spacer></v-spacer
+    ></v-row>
+        <v-row v-if="isSecretFalchion && stage>=7" class="white--text">
+      {{ secretMessage }} <v-spacer></v-spacer
+      ><v-btn small outlined @click="secretFalchion">Falchion</v-btn
       ><v-spacer></v-spacer
     ></v-row>
   </v-container>
@@ -67,10 +72,29 @@ export default {
     GameChar,
     Monster,
   },
+  props: {
+    toon: Object,
+  },
+  computed: {
+    ogrePushCurve() {
+      let curveStart = 10;
+      return curveStart + this.ogrePushing * 5;
+    },
+    dragonPushCurve() {
+      let curveStart = 10;
+      return curveStart + this.ogrePushing * 5;
+    },
+    secretMessage() {
+      return this.stage<=6 ? this.secretClubMsg : this.secretFalchionMsg;
+    },
+    halfTimeout() {
+      return this.timeout/2;
+    }
+  },
   data() {
     return {
       gameOver: false,
-      bgMessage: "",
+      displayTextColor: "",
       bgActive: "",
       displayText: "",
       combatLog: [],
@@ -86,40 +110,40 @@ export default {
       monsterTag: 200,
       bossCondition: false,
       finalBattle: false,
-      isSecret: true,
-      secretMessage: "Hey, there's a club down here!",
+      isSecretClub: true,
+      isSecretFalchion: true,
+      secretClubMsg: "Hey, there's a club down here!",
+      secretFalchionMsg: "Ooh, a falchion!",
 
-      specialActions: {
-        pushOff: 0,
-        recovering: false,
-      },
+      dragonPushing: 0,
+      ogrePushing: 0,
 
-      toon: {
-        name: "Rambo",
-        level: 1,
-        xp: 0,
-        points: 0,
-        gold: 0,
-        hp: null,
-        ac: null,
-        ap: null,
-        selectedWeapon: null,
+      // toon: {
+      //   name: "Rambo",
+      //   level: 1,
+      //   xp: 0,
+      //   points: 110,
+      //   gold: 0,
+      //   hp: null,
+      //   ac: null,
+      //   ap: null,
+      //   selectedWeapon: null,
 
-        status: {
-          defending: false,
-          recovering: false,
-          sacrifice: false,
-          lust: false,
-        },
+      //     defending: false,
+      //     recovering: false,
+      //     sacrifice: false,
+      //     lust: false,
+      
 
-        strength: 10,
-        dexterity: 8,
-        willpower: 8,
-        vigor: 5,
-      },
+      //   strength: 8,
+      //   dexterity: 6,
+      //   willpower: 4,
+      //   vigor: 5,
+      // },
 
       monsters: [
         {
+          background: "background: linear-gradient(90deg, rgba(2,0,36,0.95) 0%, rgba(8, 21, 63, 0.95) 24%, rgba(9, 20, 121, 0.95) 66%)",
           name: "Goblin",
           xp: 10,
           gold: 150,
@@ -128,18 +152,18 @@ export default {
           hp: null,
           ac: null,
           ap: null,
-                    damage: null,
-                  status: {
-          defending: false,
-          recovering: false,
+          damage: null,
 
-        },
+            defending: false,
+            recovering: false,
+
           strength: 20,
           dexterity: 1,
           willpower: 0,
           vigor: 11,
         },
         {
+          background: "background: linear-gradient(90deg, rgba(9, 12, 0, 0.95) 0%, rgba(25, 36, 5, 0.95) 24%, rgba(101, 121, 9, 0.95) 66%)",
           name: "Bugbear",
           xp: 30,
           gold: 200,
@@ -149,17 +173,17 @@ export default {
           ac: null,
           ap: null,
           damage: null,
-                  status: {
-          defending: false,
-          recovering: false,
 
-        },
+            defending: false,
+            recovering: false,
+
           strength: 25,
           dexterity: 8,
           willpower: 0,
           vigor: 12,
         },
         {
+          background: "background: linear-gradient(90deg, rgba(29, 37, 2, 0.95) 0%, rgba(102, 139, 31, 0.95) 33%, rgba(121, 63, 9, 0.95) 80%)",
           name: "Ogre",
           xp: 40,
           gold: 250,
@@ -169,17 +193,15 @@ export default {
           ac: null,
           ap: null,
           damage: null,
-                  status: {
-          defending: false,
-          recovering: false,
-
-        },
+            defending: false,
+            recovering: false,
           strength: 30,
           dexterity: 12,
           willpower: 1,
           vigor: 13,
         },
         {
+          background: "background: linear-gradient(120deg, rgba(2, 2, 1, 0.95) 10%, rgba(139, 101, 31, 0.95) 33%, rgba(121, 9, 9, 0.95) 80%)",
           name: "Darkeater Midir",
           xp: 9999,
           gold: 9999,
@@ -189,11 +211,8 @@ export default {
           ac: null,
           ap: null,
           damage: null,
-                  status: {
-          defending: false,
-          recovering: false,
-
-        },
+            defending: false,
+            recovering: false,
           strength: 60,
           dexterity: 40,
           willpower: 10,
@@ -228,7 +247,7 @@ export default {
     monsterTurn(monster) {
       setTimeout(() => {
         monster.active = true;
-        monster.status.defending = false;
+        monster.defending = false;
 
         let monsterIndex = this.encounter.indexOf(monster);
         if (monsterIndex > 0) {
@@ -236,15 +255,15 @@ export default {
         }
 
         let rollAction = Math.floor(Math.random() * 20);
-        // check if boss is recovering
 
         let damage = 0;
-        // check if boss is recovering
-        if (this.specialActions.recovering) {
+        // check if  recovering
+        if (monster.recovering) {
           damage = -1;
           // under 6 is defending
         } else if (rollAction < 6) {
-          monster.status.defending = true;
+          monster.defending = true;
+
           // heal
           let rollHeal = this.rollDamage(monster.willpower);
           if (rollHeal) {
@@ -252,19 +271,37 @@ export default {
             this.combatLog.push(`${monster.name} heals for ${rollHeal}!`);
           }
           // a 20 is max damage
-        } else if (rollAction > 16 && rollAction <= 20 && this.finalBattle) {
-          this.specialActions.recovering = true;
-          this.combatLog.push(`${monster.name}: FUS ROH DAH!!`);
+        } else if (rollAction > 16 && rollAction <= 20) {
+          if (this.finalBattle) {
+            monster.recovering = true;
+            this.combatLog.push(`${monster.name}: <span class="red--text fontshadow">FUS</span> <span class="blue--text fontshadow">ROH</span> <span class="yellow--text fontshadow">DAH!!</span>`);
+            // -2 is special
+            damage = -2;
 
-          if (this.toon.status.defending) {
-            this.combatLog.push(
-              `${this.toon.name} is braced for impact and doesn't budge!`
-            );
+            if (this.toon.defending) {
+              this.combatLog.push(
+                `${this.toon.name} is <b>braced</b> for impact and doesn't budge!`
+              );
+            } else {
+              this.dragonPushing += 1;
+            }
+          } else if (monster.name == "Ogre") {
+            monster.recovering = true;
+            this.combatLog.push(`${monster.name} <b>pushes</b> ${this.toon.name}!`);
+            // -2 is special
+            damage = -2;
+
+            if (this.toon.defending) {
+              this.combatLog.push(
+                `${this.toon.name} is <b>braced</b> for impact and doesn't budge!`
+              );
+            } else {
+              this.ogrePushing += 1;
+            }
           } else {
-            this.specialActions.pushOff += 1;
+           // roll damage
+          damage = this.rollDamage(monster.ap);
           }
-          // -2 is special
-          damage = -2;
         } else if (rollAction == 20) {
           damage = monster.ap;
         } else {
@@ -283,13 +320,13 @@ export default {
     resolveAction(damage, wielder, victim) {
       // check if recover, special, defend or attack
       if (damage == -1) {
-        this.combatLog.push(`${wielder.name} is catching his breath!`);
-        this.specialActions.recovering = false;
+        this.combatLog.push(`${wielder.name} is catching his breath...`);
+        wielder.recovering = false;
       } else if (damage == -2) {
         // special
-      } else if (wielder.status.defending) {
-        this.combatLog.push(`${wielder.name} defends!`);
-        this.bgMessage = "defend-bg";
+      } else if (wielder.defending && this.encounter.length) {
+        this.combatLog.push(`${wielder.name} <span class="red--text fontshadow">defends</span>!`);
+        this.displayTextColor = "defend-bg";
       } else {
         console.log(victim.ac + "ac");
         damage -= victim.ac;
@@ -299,21 +336,21 @@ export default {
         // Apply defense if true
         damage < 0
           ? (damage = 0)
-          : victim.status.defending
+          : victim.defending
           ? (damage -= Math.floor((damage / 100) * 25))
           : damage;
         console.log(
-          damage + ` after defending (defending = ${victim.status.defending})`
+          damage + ` after defending (defending = ${victim.defending})`
         );
 
         // Update descriptions
-        this.bgMessage = "attack-bg";
-        !damage
+        this.displayTextColor = "attack-bg";
+        damage
           ? this.combatLog.push(
-              `${wielder.name} misses ${victim.name} and deals no damage!`
+              `${wielder.name} <b>attacks</b> ${victim.name} for <span class="red--text fontshadow">${damage}</span>`
             )
           : this.combatLog.push(
-              `${wielder.name} attacks ${victim.name} for ${damage}`
+              `${wielder.name} <b>misses</b> ${victim.name} and deals <b>no</b> damage!`
             );
 
         victim.hp - damage <= 0 ? (victim.hp = 0) : (victim.hp -= damage);
@@ -325,7 +362,7 @@ export default {
     },
     endTurn() {
       setTimeout(() => {
-        this.bgMessage = "";
+        this.displayTextColor = "";
 
         this.displayText = "";
       }, this.timeout - 100);
@@ -333,6 +370,7 @@ export default {
     lock() {
       setTimeout(() => {
         this.lockMove = false;
+        this.displayText = "";
         this.encounter.forEach((monster) => {
           monster.active = false;
         });
@@ -344,22 +382,27 @@ export default {
         this.outOfCombat = true;
         this.lockMove = true;
 
+        // lust wears off
+        this.toon.lust = false;
+
         //reward
-        this.toon.gold += this.stage * 100;
+        this.toon.gold += this.stage * 50;
       }
     },
     hollow(victim) {
       if (victim.level) {
-        if(this.toon.status.sacrifice) {
-          this.combatLog.push(`The Ring of Sacrifice breaks. You cheat death!`);
+        if (this.toon.sacrifice) {
+          this.combatLog.push(`The <i>Ring of Sacrifice</i> <b>breaks</b>. You cheat death!`);
+          this.toon.sacrifice = false;
           // heal
-          this.toon.hp+=this.toon.vigor*5;
+          this.toon.hp += this.toon.vigor * 5;
+        } else {
+           this.gameOver = true;
+           this.lockMove = true;
         }
-        this.gameOver = true;
-        this.lockMove = true;
       } else {
         setTimeout(() => {
-          this.combatLog.push(`${victim.name} is dead!`);
+          this.combatLog.push(`${victim.name} is <span class="red--text fontshadow">dead</span>!`);
           this.encounter.splice(this.encounter.indexOf(victim), 1);
 
           // autotarget
@@ -368,26 +411,26 @@ export default {
           // reward
           this.toon.xp += this.rollDamage(this.toon.willpower);
           this.toon.xp += victim.xp;
-          let rollgold = this.rollDamage(victim.gold);
-          this.toon.gold += rollgold;
-          this.combatLog.push(`${this.toon.name} gained ${victim.xp} xp`);
-          this.combatLog.push(`${this.toon.name} gained ${victim.gold} g`);
+          let rollGold = this.rollDamage(victim.gold);
+          this.toon.gold += rollGold;
+          this.combatLog.push(`${this.toon.name} gained <span class="blue--text fontshadow">${victim.xp}xp</span>`);
+          this.combatLog.push(`${this.toon.name} gained <span class="yellow--text fontshadow">${rollGold}g</span>`);
 
           this.kindling();
           this.checkWin();
-        }, 1500);
+        }, this.halfTimeout);
       }
     },
     kindling() {
       if (this.toon.xp >= this.xpSlope) {
         this.toon.level += 1;
         // [1/2] bossconditions
-        if (this.toon.level >= 10) {
+        if (this.toon.level >= 2) {
           this.bossCondition = true;
         }
         this.toon.points += 4;
         this.xpSlope *= 1.5;
-        this.combatLog.push(`${this.toon.name} gained a level!`);
+        this.combatLog.push(`${this.toon.name} gained a <span class="blue--text fontshadow">level</span>!`);
         // heal player
         this.toon.hp += this.toon.willpower + 5;
       }
@@ -399,6 +442,8 @@ export default {
       this.combatLog = [];
       this.displayText = "The Final Battle!";
       this.lockMove = false;
+      this.dragonPushing = 0;
+      this.ogrePushing = 0;
 
       // heal player
       this.toon.hp = this.toon.vigor * 10;
@@ -413,6 +458,8 @@ export default {
       this.combatLog = [];
       this.displayText = "";
       this.lockMove = false;
+      this.dragonPushing = 0;
+      this.ogrePushing = 0;
 
       // [1/2] bossconditions
       if (this.stage >= 10) {
@@ -485,7 +532,7 @@ export default {
       let okay = true;
       this.inventory.forEach((weapon) => {
         if (weapon.name == "Club") {
-          this.secretMessage = "Can't carry two of these!";
+          this.secretMessage = "Can't carry <b>two</b> of these!";
           okay = false;
           return;
         }
@@ -495,11 +542,26 @@ export default {
         this.inventory.push({
           name: "Club",
           ap: 15,
-          uses: 20,
-          maxUses: 20,
+          uses: 12,
+          maxUses: 12,
           cost: 50,
         });
-        this.isSecret = false;
+        this.isSecretClub = false;
+      }
+    },
+    secretFalchion() {
+      let okay = true;
+      this.inventory.forEach((weapon) => {
+        if (weapon.name == "Falchion") {
+          this.secretMessage = "Can't carry <b>two</b> of these!";
+          okay = false;
+          return;
+        }
+      });
+      if (okay) {
+        this.secretMessage = "";
+        this.inventory.push({name: "Falchion", ap: 35, uses: 3, maxUses: 3, cost: 225 });
+        this.isSecretFalchion = false;
       }
     },
 
@@ -512,6 +574,7 @@ export default {
     percent(percent, hp) {
       return (hp / 100) * percent;
     },
+
   },
   created() {
     this.nextStage();
@@ -520,30 +583,35 @@ export default {
 </script>
 
 <style>
-.highlight {
-  background-color: rgba(0, 255, 255, 0.288);
-  background: rgba(0, 255, 255, 0.288);
+
+.fontshadow {
+  text-shadow: 1px 2px black;
 }
 
-.transitionPush {
+.pushable {
+  position: absolute;
+  width: 30%;
+}
+
+.dragonPush {
   position: absolute;
   top: 10%;
   right: 10%;
   transition: 1;
 }
-.transitionPush2 {
+.dragonPush2 {
   position: absolute;
   top: 15%;
   right: -11%;
   transition: 1;
 }
-.transitionPush3 {
+.dragonPush3 {
   position: absolute;
   top: 18%;
   right: -25%;
   transition: 1;
 }
-.transitionPush4 {
+.dragonPush4 {
   position: absolute;
   top: 20%;
   right: -30%;

@@ -31,4 +31,7 @@ props: {
   width: 150px;
 
 }
+.highlight {
+  background-color: rgba(0, 255, 255, 0.281);
+}
 </style>

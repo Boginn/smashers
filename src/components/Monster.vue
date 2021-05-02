@@ -1,12 +1,14 @@
 <template>
   <v-card @click="$parent.target = monster">
     <v-card-text
+      class="white--text"
+      :style="`${monster.background}`"
       v-bind:class="{ highlight: monster.active }"
-      class="monster-bg white--text"
     >
       <v-row>
         <v-col>
           <v-progress-linear
+            height="15"
             v-model="progressHp"
             :buffer-value="progressMaxHp"
             color="green"
@@ -16,15 +18,15 @@
       </v-row>
       <v-row>
         <v-col>
-          <h1 class="yellow--text">{{ monster.name }}</h1>
+          <h1 class="yellow--text fontshadow">{{ monster.name }}</h1>
         </v-col>
       </v-row>
 
       <v-row>
         <v-col>
-          <h2>AP: {{ attackPower }}</h2>
-          <h2>AC: {{ armorClass }}</h2>
-          <h2>HP: {{ maxHealth }}</h2>
+          <h2 class="fontshadow ">AP: {{ attackPower }}</h2>
+          <h2 class="fontshadow ">AC: {{ armorClass }}</h2>
+          <h2 class="fontshadow ">HP: {{ maxHealth }}</h2>
         </v-col>
 
         <div v-if="monster.defending">
@@ -48,7 +50,6 @@
 <script>
 export default {
   props: {
-    bgActive: String,
     monster: Object,
   },
   data: function() {
@@ -67,40 +68,19 @@ export default {
       return Math.floor(this.monster.strength + this.monster.dexterity / 2);
     },
     progressHp() {
-      return this.monster.hp * 3;
+      if (this.maxHealth >= 100) {
+        return this.monster.hp / 3;
+      }
+      return this.monster.hp;
     },
     progressMaxHp() {
-      return this.maxHealth * 3;
-    },
-  },
-  methods: {
-    attack() {
-      this.monster.defending = false;
-
-
- 
-
-      let damage = this.$parent.rollDamage(this.monster.ap);
-      console.log(this.monster.ap + "MONSTER ap");
-      console.log(damage + " MONSTER roll");
-
-      this.$emit("action", damage);
-    },
-    defend() {
-      this.monster.defending = true;
-
-      // heal
-
-      let roll = this.$parent.rollDamage(this.monster.willpower);
-      if (roll) {
-        this.monster.hp += roll;
+      if (this.maxHealth >= 100) {
+        return this.maxHealth / 3;
       }
-      this.$parent.combatLog.push(`${this.monster.name} heals for ${roll}!`);
-
-      this.$emit("action", false);
+      return this.maxHealth;
     },
-
   },
+  methods: {},
   created() {
     this.monster.hp = this.maxHealth;
     this.monster.ac = this.armorClass;
@@ -111,7 +91,21 @@ export default {
 </script>
 
 <style scoped>
-.v-card {
-  /* background: rgba(0, 73, 182, 0.925); */
+.highlight {
+  background: linear-gradient(
+    90deg,
+    rgba(2, 0, 36, 0.95) 0%,
+    rgba(8, 21, 63, 0.95) 24%,
+    rgba(9, 20, 121, 0.8) 66%
+  );
+}
+.monsterbg {
+  background: linear-gradient(
+    120deg,
+    rgba(2, 2, 1, 0.95) 10%,
+    rgba(139, 101, 31, 0.95) 33%,
+    rgba(121, 9, 9, 0.95) 80%
+  );
+  /* background-color: rgba(97, 23, 0, 0.925); */
 }
 </style>
