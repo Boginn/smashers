@@ -3,18 +3,18 @@
     <v-app-bar
       app
       dark
-      prominent
+      color="secondary"
     >
-    
-    <v-toolbar-title class="ml-15">SMASHERS!"#% 
-     <div class="subheading">Stage: {{stage}}</div>
+    <v-spacer></v-spacer>
+    <v-toolbar-title>SMASHERS!"#%
      </v-toolbar-title>
-     
+      <v-spacer></v-spacer>
 
 
     </v-app-bar>
     <v-main class='body-bg'>
       <v-container>
+        <h1 style="text-align: center" class="white--text">Stage: {{stage}}</h1>
 
         <game-main @nextStage="updateStage" />
       </v-container>
@@ -73,6 +73,11 @@ export default {
 
     .highlight-bg {
   background-color: rgba(89, 113, 145, 0.849);
+}
+
+    .button-bg {
+  background-color: rgba(28, 58, 97, 0.849);
+  background: rgba(28, 58, 97, 0.849);
 }
 </style>
 

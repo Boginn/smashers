@@ -7,7 +7,6 @@
       <v-row>
         <v-col>
           <v-progress-linear
-          
             v-model="progressHp"
             :buffer-value="progressMaxHp"
             color="green"
@@ -25,6 +24,7 @@
         <v-col>
           <h2>AP: {{ attackPower }}</h2>
           <h2>AC: {{ armorClass }}</h2>
+          <h2>HP: {{ maxHealth }}</h2>
         </v-col>
 
         <div v-if="monster.defending">
@@ -33,7 +33,7 @@
         <v-col>
           <span v-if="$parent.target">
             <img
-            style="float:right; display: inline-block; overflow: auto;"
+              style="float:right; display: inline-block; overflow: auto;"
               v-if="$parent.target.id == monster.id"
               src="../assets/crosshair.png"
               height="50px"
@@ -43,7 +43,6 @@
       </v-row>
     </v-card-text>
   </v-card>
-
 </template>
 
 <script>
@@ -68,15 +67,18 @@ export default {
       return Math.floor(this.monster.strength + this.monster.dexterity / 2);
     },
     progressHp() {
-return this.monster.hp * 3;
+      return this.monster.hp * 3;
     },
     progressMaxHp() {
-return this.maxHealth * 3;
+      return this.maxHealth * 3;
     },
   },
   methods: {
     attack() {
       this.monster.defending = false;
+
+
+ 
 
       let damage = this.$parent.rollDamage(this.monster.ap);
       console.log(this.monster.ap + "MONSTER ap");
@@ -89,15 +91,15 @@ return this.maxHealth * 3;
 
       // heal
 
-      let roll = this.$parent.randomDamage(this.monster.willpower);
-            if(roll) {
-      this.monster.hp+=roll;
-        
+      let roll = this.$parent.rollDamage(this.monster.willpower);
+      if (roll) {
+        this.monster.hp += roll;
       }
       this.$parent.combatLog.push(`${this.monster.name} heals for ${roll}!`);
 
       this.$emit("action", false);
     },
+
   },
   created() {
     this.monster.hp = this.maxHealth;
@@ -110,7 +112,6 @@ return this.maxHealth * 3;
 
 <style scoped>
 .v-card {
-
   /* background: rgba(0, 73, 182, 0.925); */
 }
 </style>

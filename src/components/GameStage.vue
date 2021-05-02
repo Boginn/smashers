@@ -1,12 +1,12 @@
 <template>
   <v-container class="body-bg">
-    <v-card >
+    <v-card>
       <v-card-text
         class="d-flex justify-center text-bg white--text"
         :class="bgMessage"
         style="min-height: 70px"
       >
-        <h3 v-if="text">{{ text }} </h3>
+        <h3 v-if="text">{{ text }}</h3>
       </v-card-text>
     </v-card>
     <br />
@@ -25,7 +25,7 @@
       <v-container v-if="outOfCombat" class="body-bg">
         <v-row v-if="isShop">
           <game-shop
-            @boughtHealth="boughtHealth"
+            @boughtItem="boughtItem"
             @boughtWeapon="boughtWeapon"
             @boughtArmor="boughtArmor"
             :toonGold="$parent.toon.gold"
@@ -97,33 +97,42 @@ export default {
   },
   methods: {
     boughtWeapon(w) {
-        let okay = true;
-        this.$parent.inventory.forEach(weapon => {
-            if(weapon.name == w.name) {
-                this.text = 'Out of stock!';
-                okay = false;
-                return;
-            }
-        });
-        if(okay) {
-
-            this.$parent.inventory.push(w);
-      this.$parent.toon.gold -= w.cost;
-      this.$parent.displayText = `Bought ${w.name} for ${w.cost}g`;
+      let okay = true;
+      this.$parent.inventory.forEach((weapon) => {
+        if (weapon.name == w.name) {
+          this.text = "Out of stock!";
+          okay = false;
+          return;
         }
+      });
+      if (okay) {
+        this.$parent.inventory.push(w);
+        this.$parent.toon.gold -= w.cost;
+        this.$parent.displayText = `Bought ${w.name} for ${w.cost}g`;
+      }
     },
     boughtArmor(a) {
-        
       this.$parent.equip = a;
       this.$parent.toon.gold -= a.cost;
       this.$parent.displayText = `Bought ${a.name} for ${a.cost}g`;
     },
-    boughtHealth(cost) {
-
-        let roll = Math.floor(this.$parent.rollDamage(this.$parent.toon.vigor*0.75));
-        this.$parent.toon.hp+=roll;
-        this.$parent.toon.gold -= cost;
-      this.$parent.displayText = `Healed for ${roll}!`;
+    boughtItem(i) {
+      if (i.name == "Some Health") {
+        let roll = Math.floor(
+          this.$parent.rollDamage(this.$parent.toon.vigor * 0.75)
+        );
+        this.$parent.toon.hp += roll;
+        this.$parent.toon.gold -= i.cost;
+        this.$parent.displayText = `Healed for ${roll}!`;
+      } else if (i.name == "Ring of Sacrifice") {
+          this.$parent.toon.status.sacrifice = true;
+          this.$parent.toon.gold -= i.cost;
+          this.$parent.displayText = `Equipped the ${i.name}!`;
+      } else if (i.name == "Bloodlust") {
+          this.$parent.toon.status.lust = true;
+          this.$parent.toon.gold -= i.cost;
+          this.$parent.displayText = `Filled with ${i.name}!`;
+      }
     },
     shopText(text) {
       this.text = text;
