@@ -1,8 +1,9 @@
 <template>
   <v-container>
       <v-row>
-        <v-col v-for="w in inventory" v-bind:key="w.name">
+        <div v-for="w in inventory" v-bind:key="w.name" class="d-flex justify-center">
           <v-btn
+          class="weapon"
           @click="$emit('changeWeapon', w)"
           small
           outlined
@@ -10,8 +11,7 @@
 
             {{w.name}} <span v-if="w.uses">({{w.uses}}/{{w.maxUses}})</span>
           </v-btn>
-        </v-col>
-<div></div>
+        </div>
       </v-row>
   </v-container>
 </template>
@@ -26,6 +26,9 @@ props: {
 }
 </script>
 
-<style>
+<style scoped>
+.weapon {
+  width: 150px;
 
+}
 </style>

@@ -1,4 +1,3 @@
-
 <template>
   <v-container>
     <v-row>
@@ -6,10 +5,13 @@
     </v-row>
 
     <v-row>
-      <v-col v-for="m in encounter" v-bind:key="m.name">
+      <v-col v-for="m in encounter" v-bind:key="m.id">
         <monster :monster="m" :bgActive="bgActive"></monster>
       </v-col>
-      <v-spacer></v-spacer>
+
+        <v-spacer v-if="encounter.length == 1"></v-spacer>
+        <v-spacer v-if="finalBattle"></v-spacer>
+
     </v-row>
 
     <v-row>
@@ -19,16 +21,20 @@
           :text="displayText"
           :combatLog="combatLog"
           :outOfCombat="outOfCombat"
+          :bossCondition="bossCondition"
+          @continue="nextStage"
         ></game-stage>
       </v-col>
       <v-col>
         <game-char
           :toon="toon"
-          @action="gameRound"
-          @lockMove="lockMove = true"
           :bgActive="bgActive"
           :equip="equip"
           :inventory="inventory"
+
+          @action="gameRound"
+          @lockMove="lockMove = true"
+          
         ></game-char>
       </v-col>
     </v-row>
@@ -60,49 +66,37 @@ export default {
       target: null,
       encounter: [],
       xpSlope: 20,
-      outOfCombat: true,
+      outOfCombat: false,
       inventory: [{ name: "Unarmed", ap: 5 }],
       equip: null,
+      monsterTag: 200,
+      bossCondition: false,
+      finalBattle: false,
 
-      cPlayer: null,
-      wPlayer: null,
-      showTodo: true,
 
       toon: {
         name: "Rambo",
         level: 1,
         xp: 0,
-        points: 1,
-        gold: 0,
+        points: 0,
+        gold: 100,
         hp: null,
         ac: null,
         ap: null,
         selectedWeapon: null,
         defending: false,
 
-        strength: 40,
+        strength: 10,
         dexterity: 8,
         willpower: 8,
-        vigor: 8,
-        // damage: null,
+        vigor: 5,
       },
-      // goblin: {
-      //   name: "Goblin",
-      //   hp: null,
-      //   ac: null,
-      //   ap: null,
-      //   defending: false,
-      //   damage: null,
-      //   strength: 10,
-      //   dexterity: 12,
-      //   willpower: 6,
-      //   vigor: 8,
-      // },
+
       monsters: [
         {
           name: "Goblin",
           xp: 10,
-          gold: 50,
+          gold: 150,
           active: false,
           targeted: false,
           hp: null,
@@ -111,14 +105,14 @@ export default {
           defending: false,
           damage: null,
           strength: 20,
-          dexterity: 4,
-          willpower: 6,
-          vigor: 8,
+          dexterity: 1,
+          willpower: 0,
+          vigor: 11,
         },
         {
           name: "Bugbear",
-          xp: 20,
-          gold: 100,
+          xp: 30,
+          gold: 200,
           active: false,
           targeted: false,
           hp: null,
@@ -126,12 +120,47 @@ export default {
           ap: null,
           defending: false,
           damage: null,
-          strength: 15,
-          dexterity: 6,
-          willpower: 6,
-          vigor: 8,
+          strength: 25,
+          dexterity: 8,
+          willpower: 0,
+          vigor: 12,
         },
+        {
+          name: "Ogre",
+          xp: 40,
+          gold: 250,
+          active: false,
+          targeted: false,
+          hp: null,
+          ac: null,
+          ap: null,
+          defending: false,
+          damage: null,
+          strength: 30,
+          dexterity: 12,
+          willpower: 1,
+          vigor: 13,
+        },
+        {
+          name: "Darkeater Midir",
+          xp: 9999,
+          gold: 9999,
+          active: false,
+          targeted: false,
+          hp: null,
+          ac: null,
+          ap: null,
+          defending: false,
+          damage: null,
+          strength: 60,
+          dexterity: 40,
+          willpower: 10,
+          vigor: 100,
+        },
+
       ],
+
+      
     };
   },
 
@@ -160,8 +189,6 @@ export default {
       // Player goes first
       this.resolveAction(damage, this.toon, this.target);
       this.endTurn();
-      
-      
 
       // then monsters
       this.encounter.forEach((monster) => {
@@ -169,8 +196,6 @@ export default {
         this.timeout += 3000;
         this.endTurn();
       });
-
-      
     },
     monsterTurn(monster) {
       setTimeout(() => {
@@ -208,7 +233,7 @@ export default {
       // check if attack or defend
       if (wielder.defending) {
         this.combatLog.push(`${wielder.name} defends!`);
-        this.bgMessage = "blue";
+        this.bgMessage = "defend-bg";
       } else {
         console.log(victim.ac + "ac");
         damage -= victim.ac;
@@ -226,10 +251,10 @@ export default {
         );
 
         // Update descriptions
-        this.bgMessage = "red";
+        this.bgMessage = "attack-bg";
         !damage
           ? this.combatLog.push(
-              `${wielder.name} attacks ${victim.name} but misses and deals no damage!`
+              `${wielder.name} misses ${victim.name} and deals no damage!`
             )
           : this.combatLog.push(
               `${wielder.name} attacks ${victim.name} for ${damage}`
@@ -258,11 +283,10 @@ export default {
       }, this.encounter.length * 4000);
     },
     checkWin() {
-
       if (!this.encounter.length) {
-        this.displayText = 'Victory!';
+        this.displayText = "Victory!";
         this.outOfCombat = true;
-        
+        this.lockMove = true;
       }
     },
     hollow(victim) {
@@ -278,10 +302,13 @@ export default {
           this.target = this.encounter[0];
 
           // reward
+          this.toon.xp += this.randomDamage(this.toon.willpower);
           this.toon.xp += victim.xp;
-          this.toon.gold += this.rollDamage(victim.gold);
+          let rollgold = this.rollDamage(victim.gold);
+          this.toon.gold += rollgold;
           this.combatLog.push(`${this.toon.name} gained ${victim.xp} xp`);
-          
+          this.combatLog.push(`${this.toon.name} gained ${victim.gold} g`);
+
           this.kindling();
           this.checkWin();
         }, 1500);
@@ -290,13 +317,102 @@ export default {
     kindling() {
       if (this.toon.xp >= this.xpSlope) {
         this.toon.level += 1;
-        this.toon.points += 2;
-        this.xpSlope *= 2;
+        // [1/2] bossconditions
+              if(this.toon.level>=2) {
+        this.bossCondition = true;
+      }
+        this.toon.points += 4;
+        this.xpSlope *= 1.5;
+        this.combatLog.push(`${this.toon.name} gained a level!`);
+        // heal player
+        this.toon.hp+=this.toon.willpower+5;
+        
+      }
+    },
+    bossStage() {
+      this.outOfCombat = false;
+      this.finalBattle = true;
+      this.displayText = 'The final battle!';
+            // heal player
+        this.toon.hp = this.toon.vigor*10;
+        this.seedEncounter(1, 4);
+ 
+    },
+    nextStage() {
+      // init
+      this.stage += 1;
+      this.combatLog = [];
+      // [1/2] bossconditions
+      if(this.stage>=10) {
+        this.bossCondition = true;
+      }
+      this.$emit('nextStage', this.stage);
+      this.outOfCombat = false;
+      this.displayText = '';
+
+      // heal player
+      if(this.toon.hp+this.toon.vigor*1 > this.toon.vigor*10) {
+        this.toon.hp = this.toon.vigor*10;
+      } else {
+        this.toon.hp+=this.toon.vigor*1;
+      }
+
+      this.lockMove = false;
+      
+
+      // seedEncounter(howMany, index of monster)
+      // 0 goblin | 1 bugbear | 3 ogre 
+
+      if (this.stage == 1) {
+        this.seedEncounter(2, 0);
+      } else if (this.stage < 4) {
+        this.seedEncounter(3, 0);
+      } else if (this.stage < 6) {
+        if( this.rollDamage(20) < 15) {
+        this.seedEncounter(1, 0);
+        this.seedEncounter(1, 1);
+        } else {
+        this.seedEncounter(2, 0);
+        this.seedEncounter(1, 1);
+        } 
+      } else if (this.stage < 8) {
+        if( this.rollDamage(20) < 15) {
+        this.seedEncounter(2, 0);
+        this.seedEncounter(1, 1);
+        } else {
+        this.seedEncounter(1, 0);
+        this.seedEncounter(2, 1);
+        } 
+      } else  {
+        if( this.rollDamage(20) < 15) {
+        this.seedEncounter(1, 1);
+        this.seedEncounter(1, 2);
+        } else {
+        this.seedEncounter(1, 2);
+        } 
       }
     },
     seedEncounter(howMany, index) {
+      
       for (let i = 0; i < howMany; i++) {
-        let monster = Object.assign({}, this.monsters[index]);
+
+
+        // create new monster
+          let monster = Object.assign({}, this.monsters[index]);
+
+        // scale attributes
+          monster.strength+=this.stage/2;
+          monster.dexterity+=this.stage/2;
+          monster.willpower+=this.stage/2;
+          monster.vigor+=this.stage/2;
+
+        // assign unique id
+        this.monsterTag+=1;
+        var tagOn = {
+          id: this.monsterTag
+        };
+        monster = Object.assign(monster, tagOn);
+        // push
         this.encounter.push(monster);
       }
     },
@@ -311,15 +427,16 @@ export default {
     },
   },
   created() {
-    this.seedEncounter(1, 0);
-    this.seedEncounter(1, 1);
+    this.nextStage();
   },
 };
 </script>
 
 <style>
+
 .highlight {
   background-color: rgba(0, 255, 255, 0.288);
+  background: rgba(0, 255, 255, 0.288);
 }
 
 </style>
