@@ -1,5 +1,6 @@
 <template>
   <v-container>
+     
     <v-row v-if="!$parent.outOfCombat">
       <v-col v-if="toon.pacifist">
         <v-btn
@@ -51,8 +52,8 @@
 
           <h1 style="height: 50px;" class="toon-title fontshadow">
             Lv.{{ toon.level }} {{ toon.name }}
-            <span style="font-size: 10pt;" v-if="equip"
-              >in <span style="font-size: 14pt;">{{ equip.name }}</span></span
+            <span style="font-size: 10pt;" v-if="toon.equip"
+              >in <span style="font-size: 14pt;">{{ toon.equip.name }}</span></span
             >
           </h1>
 
@@ -81,8 +82,9 @@
         </v-row>
 
         <v-container fluid>
-          <v-row>
+          <v-row style="align-items: center;">
             <v-col cols="auto">
+                 
               <h2>
                 HP:
                 <span
@@ -171,7 +173,7 @@
               </div>
             </v-col>
 
-            <v-col>
+            <v-col cols="auto">
               <h2>
                 Gold: <span class="yellow--text">{{ toon.gold }}</span>
               </h2>
@@ -218,13 +220,14 @@ export default {
   props: {
     toon: Object,
     inventory: Array,
-    equip: Object,
     gameOver: Boolean,
     ogrePushing: Number,
+    weaponUses: Number,
   },
   data: function() {
     return {
         input: '',
+        
     };
   },
   computed: {
@@ -233,8 +236,8 @@ export default {
     },
     armorClass() {
       let armor = 0;
-      if (this.equip) {
-        armor = this.equip.ac;
+      if (this.toon.equip) {
+        armor = this.toon.equip.ac;
       }
       return this.toon.dexterity * 1.5 + armor;
     },
@@ -275,6 +278,7 @@ export default {
       if (sw) {
         damage += sw.ap;
         sw.uses -= 1;
+        this.$emit('weaponUsed');
       }
       if (!sw.uses && sw.name != "Unarmed") {
         this.inventory.splice(this.inventory.indexOf(sw), 1);

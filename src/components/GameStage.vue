@@ -12,7 +12,7 @@
     </v-card>
     <br />
 
-    <v-card max-height="450" class="combat-log">
+    <v-card max-height="750" class="combat-log">
       <div v-if="combatLog && !outOfCombat" class="combatlog-bg white--text">
         <div
           id="log-entry"
@@ -24,6 +24,22 @@
       </div>
 
       <v-container v-if="outOfCombat" class="body-bg">
+                  <v-row>
+          <v-btn
+            block
+            outlined
+            @click="
+              $emit('continue');
+              isShop = false;
+            "
+            elevation="4"
+            medium
+            class="white--text"
+            >Next Stage</v-btn
+          >
+        </v-row>
+<v-row> <br></v-row>
+
         <v-row v-if="isShop">
           <game-shop
             @boughtItem="boughtItem"
@@ -46,21 +62,6 @@
           >
         </v-row>
         <v-row> <br></v-row>
-        <v-row>
-          <v-btn
-            block
-            outlined
-            @click="
-              $emit('continue');
-              isShop = false;
-            "
-            elevation="4"
-            medium
-            class="white--text"
-            >Next Stage</v-btn
-          >
-        </v-row>
-<v-row> <br></v-row>
         <v-row v-if="bossCondition">
           <v-btn
             block
@@ -75,6 +76,7 @@
             >... an opportunity?</v-btn
           >
         </v-row>
+        
       </v-container>
     </v-card>
   </v-container>
@@ -114,29 +116,34 @@ export default {
         this.$parent.inventory.push(w);
         this.$parent.toon.gold -= w.cost;
         this.$parent.displayText = `Bought ${w.name} for ${w.cost}g`;
+        this.$emit('spentGold', w.cost);
       }
     },
     boughtArmor(a) {
-      this.$parent.equip = a;
+      this.$parent.toon.equip = a;
       this.$parent.toon.gold -= a.cost;
       this.$parent.displayText = `Bought ${a.name} for ${a.cost}g`;
+      this.$emit('spentGold', a.cost);
     },
     boughtItem(i) {
       if (i.name == "Some Health") {
         let roll = Math.floor(
-          this.$parent.rollDamage(this.$parent.toon.vigor * 0.75)
+          this.$parent.rollDamage(this.$parent.toon.vigor * 1.5)
         );
         this.$parent.toon.hp += roll;
         this.$parent.toon.gold -= i.cost;
         this.$parent.displayText = `Healed for ${roll}!`;
+        this.$emit('spentGold', i.cost);
       } else if (i.name == "Ring of Sacrifice") {
           this.$parent.toon.sacrifice = true;
           this.$parent.toon.gold -= i.cost;
           this.$parent.displayText = `Equipped the ${i.name}!`;
+          this.$emit('spentGold', i.cost);
       } else if (i.name == "Bloodlust") {
           this.$parent.toon.lust = true;
           this.$parent.toon.gold -= i.cost;
           this.$parent.displayText = `Filled with ${i.name} for one round!`;
+          this.$emit('spentGold', i.cost);
       }
     },
     shopText(text) {

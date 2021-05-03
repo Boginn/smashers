@@ -82,6 +82,7 @@ export default {
           ac: null,
           ap: null,
           selectedWeapon: null,
+          equip: null,
 
           defending: false,
           recovering: false,
@@ -108,6 +109,7 @@ export default {
           ac: null,
           ap: null,
           selectedWeapon: null,
+          equip: null,
 
           defending: false,
           recovering: false,
@@ -137,6 +139,7 @@ export default {
           ac: null,
           ap: null,
           selectedWeapon: null,
+          equip: null,
 
           defending: false,
           recovering: false,
@@ -154,7 +157,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .highlight:hover {
   cursor: pointer;
   /* background: linear-gradient(

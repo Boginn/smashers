@@ -5,8 +5,8 @@
         <v-container>
           <h1 style="text-align: center">{{ message }}</h1>
           <br>
-    <v-card v-if="!gameOver">
-      <v-card-text class="toon-bg grey--text pa-10" :style="`${toon.background}`">
+    <v-card>
+      <v-card-text class="grey--text pa-10" :style="`${toon.background}`">
         <v-row style="height: 75px;">
 
 
@@ -14,8 +14,8 @@
 
           <h1 style="height: 50px;" class="toon-title fontshadow">
             Lv.{{ toon.level }} {{ toon.name }}
-            <span style="font-size: 10pt;" v-if="equip"
-              >in <span style="font-size: 14pt;">{{ equip.name }}</span></span
+            <span style="font-size: 10pt;" v-if="toon.equip"
+              >in <span style="font-size: 14pt;">{{ toon.equip.name }}</span></span
             >
           </h1>
 
@@ -28,17 +28,16 @@
           <v-row>
             <v-col cols="auto">
               <h2>
-                HP:
+                Health Pool:
                 <span class="green--text">
-                  {{ toon.hp }}
+                  {{ maxHealth }}
                 </span>
               </h2>
               <h2>
-                AP: <span class="red--text"> {{ attackPower }}</span> +
-                <span class="red--text">{{ toon.selectedWeapon.ap }}</span>
+                Attack Power: <span class="red--text"> {{ attackPower }}</span>
               </h2>
               <h2>
-                AC: <span class="cyan--text">{{ armorClass }}</span>
+                Armor Class: <span class="cyan--text">{{ armorClass }}</span>
               </h2>
             </v-col>
 
@@ -49,6 +48,8 @@
               <h3>
                 Dexterity:<span class="lime--text"> {{ toon.dexterity }}</span>
               </h3>
+            </v-col>
+              <v-col cols="auto">
               <h3>
                 Vigor: <span class="red--text"> {{ toon.vigor }}</span>
               </h3>
@@ -58,14 +59,25 @@
             </v-col>
 
 
-            <v-col>
+            <v-col cols="auto">
               <h2>
                 Gold: <span class="yellow--text">{{ toon.gold }}</span>
               </h2>
               <h2>
-                XP: <span class="blue--text">{{ toon.xp }}</span>
+                Spent Gold: <span class="yellow--text">{{ spentGold }}</span>
+              </h2>
+              <h2>
+                Experience: <span class="blue--text">{{ toon.xp }}</span>
               </h2>
             </v-col>
+
+                        <v-col cols="auto">
+              <h2>
+                Weapon Uses: <span class="white--text">{{ weaponUses }}</span>
+              </h2>
+
+            </v-col>
+
           </v-row>
 
         </v-container>
@@ -86,12 +98,17 @@ export default {
   name: "Win",
   props: {
     toon: Object,
+    spentGold: Number,
+    weaponUses: Number,
   },
   computed: {
+        maxHealth() {
+      return this.toon.vigor * 10;
+    },
         armorClass() {
       let armor = 0;
-      if (this.equip) {
-        armor = this.equip.ac;
+      if (this.toon.equip) {
+        armor = this.toon.equip.ac;
       }
       return this.toon.dexterity * 1.5 + armor;
     },

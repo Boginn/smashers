@@ -12,12 +12,12 @@
       <router-view></router-view>
 
       <v-container>
-        <win v-if="gameWon" :toon="pickedCharacter"/>
+        <win v-if="gameWon" :spentGold="spentGold" :weaponUses="weaponUses" :toon="pickedCharacter"/>
         <welcome v-if="characterSelect && !gameWon" @begin="selectCharacter" />
         <game-main
           v-if="!characterSelect && !gameWon"
           @nextStage="updateStage"
-          @win="gameWon = true"
+          @win="initWin"
           :toon="pickedCharacter"
         />
       </v-container>
@@ -38,9 +38,17 @@ export default {
     GameMain,
     Win
   },
+  props: {
+    
+  },
   computed: {},
 
   methods: {
+    initWin(g, uses) {
+      this.spentGold = g;
+      this.weaponUses = uses;
+      this.gameWon = true
+    },
     updateStage(nr) {
       this.stage = nr;
     },
@@ -52,6 +60,8 @@ export default {
 
   data: () => ({
     stage: 0,
+    spentGold: 0,
+    weaponUses: 0,
     characterSelect: true,
     pickedCharacter: null,
     gameWon: false,
