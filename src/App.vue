@@ -5,7 +5,7 @@
       <v-spacer></v-spacer>
       <h1 v-if="!characterSelect" style="text-align: center" class="white--text fontshadow"> Stage: {{ stage }}</h1>
       <v-spacer></v-spacer>
-      <router-link to="/#"><v-tab class="white--text">New Game</v-tab></router-link>
+      <router-link to="/#"><v-tab class="white--text">Game</v-tab></router-link>
       <router-link to="/Help"><v-tab class="white--text">Help</v-tab></router-link>
     </v-app-bar>
     <v-main class="body-bg">
@@ -17,7 +17,7 @@
         <game-main
           v-if="!characterSelect && !gameWon"
           @nextStage="updateStage"
-          :gameWon="gameWon"
+          @win="gameWon = true"
           :toon="pickedCharacter"
         />
       </v-container>

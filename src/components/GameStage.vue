@@ -37,38 +37,41 @@
         <v-row v-if="!isShop">
           <v-btn
             block
+            outlined
             @click="isShop = true"
-            color="primary"
             elevation="4"
             medium
+            class="white--text"
             >Shop</v-btn
           >
         </v-row>
-
+        <v-row> <br></v-row>
         <v-row>
           <v-btn
             block
+            outlined
             @click="
               $emit('continue');
               isShop = false;
             "
-            color="primary"
             elevation="4"
             medium
-            >Continue</v-btn
+            class="white--text"
+            >Next Stage</v-btn
           >
         </v-row>
-
+<v-row> <br></v-row>
         <v-row v-if="bossCondition">
           <v-btn
             block
+            outlined
             @click="
               $emit('bossStage');
               isShop = false;
             "
-            color="primary"
             elevation="4"
             medium
+            class="white--text"
             >... an opportunity?</v-btn
           >
         </v-row>
@@ -154,6 +157,7 @@ export default {
 }
 #log-entry {
   padding: 3px;
+  padding-right: 10px;
   text-align: end;
 
   border: 1px dotted black;

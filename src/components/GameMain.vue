@@ -27,7 +27,7 @@
       <v-col>
                 <v-row v-if="isSecretHalberd && finalBattle && !toon.pacifist" class="white--text ma-2">
                   Something Sparkles <v-spacer></v-spacer>
-     <v-btn small outlined @click="etherealHalberd">Ethereal Halberd</v-btn
+     <v-btn class="white--text" small outlined @click="etherealHalberd">Ethereal Halberd</v-btn
       >
       </v-row>
         <div
@@ -55,12 +55,12 @@
     </v-row>
     <v-row v-if="isSecretClub && stage<=6" class="white--text">
       {{ secretMessage }} <v-spacer></v-spacer
-      ><v-btn small outlined @click="secretClub">Club</v-btn
+      ><v-btn class="white--text" small outlined @click="secretClub">Club</v-btn
       ><v-spacer></v-spacer
     ></v-row>
         <v-row v-if="isSecretFalchion && stage>=7" class="white--text">
       {{ secretMessage }} <v-spacer></v-spacer
-      ><v-btn small outlined @click="secretFalchion">Falchion</v-btn
+      ><v-btn class="white--text" small outlined @click="secretFalchion">Falchion</v-btn
       ><v-spacer></v-spacer
     ></v-row>
 
@@ -80,7 +80,6 @@ export default {
   },
   props: {
     toon: Object,
-      gameWon: Boolean,
 
   },
   computed: {
@@ -225,20 +224,29 @@ export default {
       // check if preaching
       if(isNaN(damage)) {
         // damage is String input
-        var input = damage.split("").reverse().join("");
+        let input = damage.split("").reverse().join("");
+        
 
       if(this.finalBattle) {
-          if(input == this.lastLine) {
+        let checkAgainst = this.isolateStringFromHtml(this.lastLine);
+        if(input == checkAgainst) {
+          if(this.target.lines.length>1) {
             this.target.lines.splice(this.target.lines.indexOf(this.lastLine), 1);
+            this.target.hp/=3;
+            this.combatLog.push(`${this.toon.name} mirrors the words of ${this.target.name} and throws them back at him. It is <b class="fontshadow">super effective</b>, soon he will have nothing more to say!`);
+          } else {
+            this.target.hp=0;
+            this.hollow(this.target);
+          }
           }
       } else {
-
-        
+       
         if(input == this.target.name) {
           this.hollow(this.target);
         }
           } 
       } else {
+        // not preaching, proceed
         this.resolveAction(damage, this.toon, this.target);
       }
       this.endTurn();
@@ -393,7 +401,7 @@ export default {
     checkWin() {
       if (!this.encounter.length) {
         if(this.finalBattle) {
-          this.gameWon = true;
+          this.$emit('win');
         } else {
 
           this.displayText = "Victory!";
@@ -447,7 +455,7 @@ export default {
       if (this.toon.xp >= this.xpSlope) {
         this.toon.level += 1;
         // [1/2] bossconditions
-        if (this.toon.level >= 2) {
+        if (this.toon.level >= 10) {
           this.bossCondition = true;
         }
         this.toon.points += 4;
@@ -617,6 +625,11 @@ export default {
     },
     percent(percent, hp) {
       return (hp / 100) * percent;
+    },
+    isolateStringFromHtml(str) {
+        var a = str.split(">");
+        var b = a[1].split("<");
+        return b[0];
     },
 
   },

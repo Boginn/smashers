@@ -6,48 +6,42 @@
           <h1>{{ welcome }}</h1>
           <h3>{{ message }}</h3>
         </v-container>
-        <v-container fluid >
-          <v-row  @click="$emit('begin', toon)" v-for="toon in characters" v-bind:key="toon.name" class="ma-1 pa-1 highlight">
-<v-col>
-
-            <h1
-              
-              style="height: 50px;"
-              class="fontshadow"
-            >
-              {{ toon.name }}
-            </h1>
-</v-col>
-              <v-col cols="auto">
-                <h3>
-                  Strength:
-                  <span class="orange--text"> {{ toon.strength }}</span>
-                </h3>
-                <h3>
-                  Dexterity:<span class="lime--text">
-                    {{ toon.dexterity }}</span
-                  >
-                </h3>
-                </v-col>
-                <v-col>
-                  
-                <h3>
-                  Vigor: <span class="red--text"> {{ toon.vigor }}</span>
-                </h3>
-                <h3>
-                  Willpower:
-                  <span class="blue--text"> {{ toon.willpower }}</span>
-                </h3>
-              </v-col>
-              <v-col>
-                            <h2
-              
-              style="height: 50px;"
-              class="fontshadow"
-            >
-              {{ toon.difficulty }}
-            </h2>
-              </v-col>
+        <v-container fluid>
+          <v-row
+            @click="$emit('begin', toon)"
+            v-for="toon in characters"
+            v-bind:key="toon.name"
+            
+            class="ma-1 pa-1 highlight fontshadow"
+          >
+            <v-col>
+              <h1 style="height: 50px;" class="fontshadow">
+                {{ toon.name }}
+              </h1>
+            </v-col>
+            <v-col cols="auto">
+              <h3>
+                Strength:
+                <span class="orange--text"> {{ toon.strength }}</span>
+              </h3>
+              <h3>
+                Dexterity:<span class="lime--text"> {{ toon.dexterity }}</span>
+              </h3>
+            </v-col>
+            <v-col>
+              <h3>
+                Vigor: <span class="red--text"> {{ toon.vigor }}</span>
+              </h3>
+              <h3>
+                Willpower:
+                <span class="blue--text"> {{ toon.willpower }}</span>
+              </h3>
+            </v-col>
+            <v-col>
+              <h2 style="height: 50px;" class="fontshadow">
+                {{ toon.difficulty }}
+              </h2>
+            </v-col>
           </v-row>
         </v-container>
       </v-card-text>
@@ -62,16 +56,22 @@
 export default {
   name: "Welcome",
   components: {},
+  methods: {
+    toonBackgroundHover(i) {
 
+      this.characters[i].background;
+    }
+  },
   data() {
     return {
       welcome: 'Welcome to SMASHERS!"#%',
       message: "Pick a character:",
       characters: [
         {
-          background: "background: linear-gradient(180deg,rgba(12, 80, 92, 0.95) 0%,rgba(51, 1, 26, 0.9) 75%)",
+          background:
+            "background: linear-gradient(180deg,rgba(12, 80, 92, 0.95) 0%,rgba(51, 1, 26, 0.9) 75%)",
           difficulty: "Hard",
-          lines: ['Any%!', "Therefore, dragon."],
+          lines: ["Any%!", "Therefore, dragon."],
           name: "Depraved",
           pacifist: false,
           level: 1,
@@ -94,9 +94,10 @@ export default {
           vigor: 3,
         },
         {
-          background: "background: linear-gradient(180deg,rgb(0, 55, 86, 0.95) 0%,rgba(0, 80, 85, 0.9) 75%)",
+          background:
+            "background: linear-gradient(180deg,rgb(0, 55, 86, 0.95) 0%,rgba(0, 80, 85, 0.9) 75%)",
           difficulty: "Normal",
-          lines: ['They drew first blood!', "Of course it's a dragon!!"],
+          lines: ["They drew first blood!", "Of course it's a dragon!!"],
           name: "Rambo",
           pacifist: false,
           level: 1,
@@ -119,9 +120,13 @@ export default {
           vigor: 5,
         },
         {
-          background: "background: linear-gradient(180deg, rgba(0, 86, 39, 0.95) 0%, rgba(0, 27, 85, 0.9) 75%)",
-          difficulty: "Interesting",
-          lines: ["Who needs weapons when you have the power of god? These creatures don't like hearing their name <b class=\"cyan--text\">sdrawkcab</b>. For bigger creatures with something to say, I might be able to use their <b class=\"cyan--text\">sdrow</b> against them!", "Not even a dragon can withstand my verses!"], 
+          background:
+            "background: linear-gradient(180deg, rgba(0, 86, 39, 0.95) 0%, rgba(0, 27, 85, 0.9) 75%)",
+          difficulty: "Pacifist",
+          lines: [
+            'Who needs weapons when you have the power of god? These creatures don\'t like hearing their name <b class="cyan--text">sdrawkcab</b>. For bigger creatures with something to say, I might be able to use their <b class="cyan--text">sdrow</b> against them!',
+            "Not even a dragon can withstand my verses!",
+          ],
           name: "Pharc",
           pacifist: true,
           level: 1,
@@ -151,7 +156,6 @@ export default {
 
 <style>
 .highlight:hover {
-  border-radius: 5px;
   cursor: pointer;
   /* background: linear-gradient(
     90deg,
@@ -160,4 +164,10 @@ export default {
     rgba(9, 20, 121, 0.8) 66%
   ); */
   background: rgba(63, 165, 190, 0.171);
-}</style>
+}
+.highlight {
+    border-radius: 5px;
+
+  border: 2px dotted white;
+}
+</style>

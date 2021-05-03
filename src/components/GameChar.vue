@@ -37,7 +37,7 @@
     </v-row>
     <br />
     <v-card v-if="!gameOver">
-      <v-card-text class="toon-bg grey--text pa-10" :style="`${toon.background}`">
+      <v-card-text class="grey--text pa-10" :style="`${toon.background}`">
         <v-row style="height: 75px;">
           <v-progress-linear
             height="15"
@@ -124,12 +124,12 @@
                   min-width="10"
                   v-if="toon.points"
                   @click="toon.strength = spendPoint(toon.strength)"
-                  color="accent"
                   elevation="3"
                   x-small
+                  style="background: goldenrod; color: white"
                   >&plus;</v-btn
                 >
-                <span v-if="toon.points"> ({{ toon.points }})</span>
+                <span v-if="toon.points"> (<b class="white--text">{{ toon.points }}</b>)</span>
               </div>
 
               <div>
@@ -137,24 +137,24 @@
                   min-width="10"
                   v-if="toon.points"
                   @click="toon.dexterity = spendPoint(toon.dexterity)"
-                  color="accent"
                   elevation="3"
                   x-small
+                  style="background: goldenrod; color: white"
                   >&plus;</v-btn
                 >
-                <span v-if="toon.points"> ({{ toon.points }})</span>
+                <span v-if="toon.points"> (<b class="white--text">{{ toon.points }}</b>)</span>
               </div>
               <div>
                 <v-btn
                   min-width="10"
                   v-if="toon.points"
                   @click="toon.vigor = spendPoint(toon.vigor)"
-                  color="accent"
                   elevation="3"
                   x-small
+                  style="background: goldenrod; color: white"
                   >&plus;</v-btn
                 >
-                <span v-if="toon.points"> ({{ toon.points }})</span>
+                <span v-if="toon.points"> (<b class="white--text">{{ toon.points }}</b>)</span>
               </div>
 
               <div>
@@ -162,12 +162,12 @@
                   min-width="10"
                   v-if="toon.points"
                   @click="toon.willpower = spendPoint(toon.willpower)"
-                  color="accent"
                   elevation="3"
                   x-small
+                  style="background: goldenrod; color: white"
                   >&plus;</v-btn
                 >
-                <span v-if="toon.points"> ({{ toon.points }})</span>
+                <span v-if="toon.points"> (<b class="white--text">{{ toon.points }}</b>)</span>
               </div>
             </v-col>
 
@@ -185,6 +185,7 @@
               :inventory="inventory"
               :selectedWeapon="toon.selectedWeapon"
               :toon="toon"
+              :lockMove="$parent.lockMove"
               @preach='preach'
               @changeWeapon="changeWeapon"
             >
@@ -194,8 +195,14 @@
       </v-card-text>
     </v-card>
     <v-card v-else>
-      <v-card-text class="toon-bg white--text pa-10">
+      <v-card-text class="white--text pa-10" :style="`${toon.background}`">
         <h1 style="text-align: center">You died</h1>
+        <br>
+      <v-btn
+      @click="$router.go()"
+      block
+      outlined
+      class="white--text">New Game</v-btn>
       </v-card-text>
     </v-card>
   </v-container>
@@ -339,41 +346,6 @@ export default {
     this.toon.ac = this.armorClass;
     this.toon.ap = this.attackPower;
     this.toon.selectedWeapon = this.inventory[0];
-    //  this.inventory.push({
-    //    name: "Club",
-    //    ap: 15,
-    //    uses: 20,
-    //    maxUses: 20,
-    //    cost: 50,
-    //  });
-    // this.inventory.push({
-    //   name: "Crossbow",
-    //   ap: 20,
-    //   uses: 10,
-    //   maxUses: 10,
-    //   cost: 75,
-    // });
-    // this.inventory.push({
-    //   name: "Falchion",
-    //   ap: 25,
-    //   uses: 3,
-    //   maxUses: 3,
-    //   cost: 100,
-    // });
-    // this.inventory.push({
-    //   name: "Halberd",
-    //   ap: 45,
-    //   uses: 3,
-    //   maxUses: 3,
-    //   cost: 350,
-    // });
-    // this.inventory.push({
-    //   name: "Death Star",
-    //   ap: 88,
-    //   uses: 1,
-    //   maxUses: 2,
-    //   cost: 1000,
-    // });
   },
 };
 </script>
@@ -381,6 +353,10 @@ export default {
 <style scoped>
 .toon-title {
   color: goldenrod;
+}
+.goldenrod-bg {
+  background: goldenrod;
+  height: 1000px;
 }
 
 .attack-bg {
