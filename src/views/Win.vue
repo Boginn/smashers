@@ -75,6 +75,9 @@
               <h2>
                 Weapon Uses: <span class="white--text">{{ weaponUses }}</span>
               </h2>
+              <h2>
+                Stage: <span class="white--text">{{ stage }}</span>
+              </h2>
 
             </v-col>
 
@@ -100,6 +103,7 @@ export default {
     toon: Object,
     spentGold: Number,
     weaponUses: Number,
+    stage: Number,
   },
   computed: {
         maxHealth() {

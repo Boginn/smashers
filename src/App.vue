@@ -1,18 +1,32 @@
 <template>
   <v-app>
-    <v-app-bar app dark color="teal">
+    <v-app-bar app dark class="appbar-bg">
       <v-toolbar-title>SMASHERS!"#% </v-toolbar-title>
       <v-spacer></v-spacer>
-      <h1 v-if="!characterSelect" style="text-align: center" class="white--text fontshadow"> Stage: {{ stage }}</h1>
+      <h1
+        v-if="!characterSelect"
+        style="text-align: center"
+        class="white--text fontshadow"
+      >
+        Stage: {{ stage }}
+      </h1>
       <v-spacer></v-spacer>
-      <router-link to="/#"><v-tab class="white--text">Game</v-tab></router-link>
-      <router-link to="/Help"><v-tab class="white--text">Help</v-tab></router-link>
+      <router-link to="/#" style="text-decoration: none"><v-tab class="white--text">Game</v-tab></router-link>
+      <router-link to="/Help"
+         style="text-decoration: none"><v-tab class="white--text">Help</v-tab></router-link
+      >
     </v-app-bar>
     <v-main class="body-bg">
       <router-view></router-view>
 
       <v-container>
-        <win v-if="gameWon" :spentGold="spentGold" :weaponUses="weaponUses" :toon="pickedCharacter"/>
+        <win
+          v-if="gameWon"
+          :spentGold="spentGold"
+          :stage="stage"
+          :weaponUses="weaponUses"
+          :toon="pickedCharacter"
+        />
         <welcome v-if="characterSelect && !gameWon" @begin="selectCharacter" />
         <game-main
           v-if="!characterSelect && !gameWon"
@@ -36,18 +50,16 @@ export default {
   components: {
     Welcome,
     GameMain,
-    Win
+    Win,
   },
-  props: {
-    
-  },
+  props: {},
   computed: {},
 
   methods: {
     initWin(g, uses) {
       this.spentGold = g;
       this.weaponUses = uses;
-      this.gameWon = true
+      this.gameWon = true;
     },
     updateStage(nr) {
       this.stage = nr;
@@ -83,7 +95,12 @@ export default {
   background-color: rgba(28, 58, 97, 0.849);
   background: rgba(28, 58, 97, 0.849);
 }
-.white--text {
-  color: grey;
+
+.appbar-bg {
+  background: linear-gradient(
+    105deg,
+    rgba(196, 54, 54, 0.95) 20%,
+    rgba(3, 39, 107, 0.9) 75%
+  );
 }
 </style>

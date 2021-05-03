@@ -2,14 +2,15 @@
   <v-container class="body-bg">
     <v-card>
       <v-card-text
-        class="d-flex justify-center text-bg white--text"
+        class="d-flex justify-center panel-bg white--text"
         :class="textColor"
-        style="min-height: 70px"
+        style="min-height: 70px; font-size: 14pt"
       >
-        <h3 v-html="text" v-if="text"></h3>
-        <h3 v-if="text == '' && outOfCombat">{{ defaultMessage }}</h3>
+        <p v-html="text" v-if="text"></p>
+        <p v-if="text == '' && outOfCombat">{{ defaultMessage }}</p>
       </v-card-text>
     </v-card>
+    
     <br />
 
     <v-card max-height="750" class="combat-log">
@@ -158,9 +159,8 @@ export default {
   overflow: hidden;
 }
 .combatlog-bg {
-  /* background-color: rgb(22, 92, 138); */
-    background: linear-gradient(90deg, rgba(32, 48, 87, 0.95) 0%, rgba(8, 55, 63, 0.95) 24%, rgba(6, 78, 44, 0.76) 80%);
-
+    /* background: linear-gradient(90deg, rgba(32, 48, 87, 0.95) 0%, rgba(8, 55, 63, 0.95) 24%, rgba(6, 78, 44, 0.76) 80%); */
+background: rgba(0, 0, 0, 0.87);
 }
 #log-entry {
   padding: 3px;
@@ -169,13 +169,11 @@ export default {
 
   border: 1px dotted black;
 }
-.text-bg {
-  background-color: rgba(102, 128, 163, 0.774);
-}
+
   .defend-bg {
     background-color: rgba(49, 91, 146, 0.877);
   }
   .attack-bg {
-    background-color: rgba(168, 103, 50, 0.95);
+    background-color: rgb(68, 31, 0);
   }
 </style>

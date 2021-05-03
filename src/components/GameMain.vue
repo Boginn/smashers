@@ -5,10 +5,14 @@
     </v-row>
 
     <v-row>
+      <v-spacer v-if="encounter.length == 1 && !finalBattle"></v-spacer>
+      <v-spacer v-if="encounter.length == 2 && !finalBattle"></v-spacer>
+      
       <v-col v-for="m in encounter" v-bind:key="m.id">
         <monster :monster="m"></monster>
       </v-col>
 
+      <v-spacer v-if="encounter.length == 2 && !finalBattle"></v-spacer>
       <v-spacer v-if="encounter.length == 1 && !finalBattle"></v-spacer>
     </v-row>
 
@@ -31,7 +35,7 @@
           v-if="isSecretHalberd && finalBattle && !toon.pacifist"
           class="white--text ma-2"
         >
-          {{ secretMessageHalberdMsg }}} <v-spacer></v-spacer>
+          {{ secretMessageHalberdMsg }} <v-spacer></v-spacer>
           <v-btn class="white--text" small outlined @click="etherealHalberd"
             >Ethereal Halberd</v-btn
           >
@@ -530,7 +534,7 @@ export default {
       if (this.toon.xp >= this.xpSlope) {
         this.toon.level += 1;
         // [1/2] bossconditions
-        if (this.toon.level >= 2) {
+        if (this.toon.level >= 10) {
           this.bossCondition = true;
         }
         this.toon.points += 4;
@@ -702,7 +706,7 @@ export default {
     etherealHalberd() {
       this.inventory.forEach((weapon) => {
         if (weapon.name == "Halberd") {
-          this.combatLog(`${this.toon.name} throws away the normal ${weapon.name}!`);
+          this.combatLog.push(`${this.toon.name} throws away the normal ${weapon.name}!`);
           this.inventory.splice(this.inventory.indexOf(weapon), 1);
         }
       });
