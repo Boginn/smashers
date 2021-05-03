@@ -149,7 +149,7 @@ export default {
 }
 .combatlog-bg {
   /* background-color: rgb(22, 92, 138); */
-    background: linear-gradient(90deg, rgba(32, 48, 87, 0.95) 0%, rgba(8, 55, 63, 0.95) 24%, rgba(9, 121, 35, 0.95) 66%);
+    background: linear-gradient(90deg, rgba(32, 48, 87, 0.95) 0%, rgba(8, 55, 63, 0.95) 24%, rgba(6, 78, 44, 0.76) 80%);
 
 }
 #log-entry {

@@ -1,32 +1,43 @@
 <template>
   <v-container>
     <v-row v-if="!$parent.outOfCombat">
-      <v-col>
+      <v-col v-if="toon.pacifist">
+        <v-btn
+          block
+          height="70" 
+          @click="meditate"
+          :disabled="$parent.lockMove"
+          v-bind:class="{ disbld: $parent.lockMove }"
+          class="defend-bg yellow--text fontshadow"
+          >meditate</v-btn
+        >
+      </v-col>
+      <v-col v-if="!gameOver && !toon.pacifist">
         <v-btn
           block
           height="70"
           @click="attack"
           :disabled="$parent.lockMove"
           v-bind:class="{ disbld: $parent.lockMove }"
-          class="redgradient yellow--text fontshadow"
+          class="attack-bg yellow--text fontshadow"
           >attack</v-btn
         >
       </v-col>
-      <v-col>
+      <v-col v-if="!gameOver && !toon.pacifist">
         <v-btn
           block
           height="70"
           @click="defend"
           :disabled="$parent.lockMove"
           v-bind:class="{ disbld: $parent.lockMove }"
-          class="bluegradient yellow--text fontshadow"
+          class="defend-bg yellow--text fontshadow"
           >defend</v-btn
         >
       </v-col>
     </v-row>
     <br />
     <v-card v-if="!gameOver">
-      <v-card-text class="toon-bg grey--text pa-10">
+      <v-card-text class="toon-bg grey--text pa-10" :style="`${toon.background}`">
         <v-row style="height: 75px;">
           <v-progress-linear
             height="15"
@@ -68,21 +79,6 @@
               alt=""
           /></span>
         </v-row>
-
-        <!-- <v-row>
-          <v-col>
-            <span
-          :class="
-            toon.hp < $parent.percent(30, maxHealth)
-              ? 'red--text'
-              : 'green--text'
-          "
-        >
-          HP: {{ toon.hp }}
-
-        </span>
-          </v-col>
-        </v-row> -->
 
         <v-container fluid>
           <v-row>
@@ -187,7 +183,9 @@
           <v-row>
             <game-weapon
               :inventory="inventory"
-              :selectedWeapon="this.toon.selectedWeapon"
+              :selectedWeapon="toon.selectedWeapon"
+              :toon="toon"
+              @preach='preach'
               @changeWeapon="changeWeapon"
             >
             </game-weapon>
@@ -218,7 +216,9 @@ export default {
     ogrePushing: Number,
   },
   data: function() {
-    return {};
+    return {
+        input: '',
+    };
   },
   computed: {
     maxHealth() {
@@ -286,7 +286,7 @@ export default {
 
       // add bloodlust damage
       if (this.toon.lust) {
-        damage += this.$parent.stage * 5;
+        damage += this.$parent.stage * 3;
       }
 
       this.$emit("action", damage);
@@ -315,6 +315,15 @@ export default {
       }
 
       this.$emit("action", false);
+    },
+    preach(input) {
+        this.toon.defending = false;
+        this.$emit("action", input);
+        
+    },
+    meditate() {
+        this.$parent.combatLog.push(`<span class="yellow--text fontshadow"><b">${this.toon.name}</b> says: ` + this.toon.lines[0] + '</span>');
+        this.defend();
     },
 
     spendPoint(attribute) {
@@ -370,25 +379,18 @@ export default {
 </script>
 
 <style scoped>
-.toon-bg {
-  background-color: rgb(0, 110, 86);
-  background: linear-gradient(
-    180deg,
-    rgb(0, 55, 86, 0.95) 0%,
-    rgba(0, 80, 85, 0.9) 75%
-  );
-}
 .toon-title {
   color: goldenrod;
 }
-.redgradient {
+
+.attack-bg {
   background: linear-gradient(
     120deg,
     rgba(202, 189, 3, 0.95) -60%,
     rgba(196, 54, 54, 0.95) 30%
   );
 }
-.bluegradient {
+.defend-bg {
   background: linear-gradient(
     105deg,
     rgba(196, 54, 54, 0.95) 20%,

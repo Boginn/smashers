@@ -25,6 +25,11 @@
         ></game-stage>
       </v-col>
       <v-col>
+                <v-row v-if="isSecretHalberd && finalBattle && !toon.pacifist" class="white--text ma-2">
+                  Something Sparkles <v-spacer></v-spacer>
+     <v-btn small outlined @click="etherealHalberd">Ethereal Halberd</v-btn
+      >
+      </v-row>
         <div
           :style="`top: ${ogrePushCurve}%; top: ${dragonPushCurve}%; right: ${dragonPushCurve}%`"
           v-bind:class="{
@@ -58,6 +63,7 @@
       ><v-btn small outlined @click="secretFalchion">Falchion</v-btn
       ><v-spacer></v-spacer
     ></v-row>
+
   </v-container>
 </template>
 
@@ -74,6 +80,8 @@ export default {
   },
   props: {
     toon: Object,
+      gameWon: Boolean,
+
   },
   computed: {
     ogrePushCurve() {
@@ -112,34 +120,13 @@ export default {
       finalBattle: false,
       isSecretClub: true,
       isSecretFalchion: true,
+      isSecretHalberd: true,
       secretClubMsg: "Hey, there's a club down here!",
       secretFalchionMsg: "Ooh, a falchion!",
+      
 
       dragonPushing: 0,
       ogrePushing: 0,
-
-      // toon: {
-      //   name: "Rambo",
-      //   level: 1,
-      //   xp: 0,
-      //   points: 110,
-      //   gold: 0,
-      //   hp: null,
-      //   ac: null,
-      //   ap: null,
-      //   selectedWeapon: null,
-
-      //     defending: false,
-      //     recovering: false,
-      //     sacrifice: false,
-      //     lust: false,
-      
-
-      //   strength: 8,
-      //   dexterity: 6,
-      //   willpower: 4,
-      //   vigor: 5,
-      // },
 
       monsters: [
         {
@@ -159,7 +146,7 @@ export default {
 
           strength: 20,
           dexterity: 1,
-          willpower: 0,
+          willpower: 5,
           vigor: 11,
         },
         {
@@ -179,7 +166,7 @@ export default {
 
           strength: 25,
           dexterity: 8,
-          willpower: 0,
+          willpower: 10,
           vigor: 12,
         },
         {
@@ -197,11 +184,12 @@ export default {
             recovering: false,
           strength: 30,
           dexterity: 12,
-          willpower: 1,
+          willpower: 15,
           vigor: 13,
         },
         {
           background: "background: linear-gradient(120deg, rgba(2, 2, 1, 0.95) 10%, rgba(139, 101, 31, 0.95) 33%, rgba(121, 9, 9, 0.95) 80%)",
+          lines: ["<b class=\"fontshadow\">Your arrogance will be your undoing</b>", "<b class=\"fontshadow\">Break yourself upon my body</b>", "<b class=\"fontshadow\">You cannot elude my targeting system</b>"],
           name: "Darkeater Midir",
           xp: 9999,
           gold: 9999,
@@ -215,7 +203,7 @@ export default {
             recovering: false,
           strength: 60,
           dexterity: 40,
-          willpower: 10,
+          willpower: 20,
           vigor: 100,
         },
       ],
@@ -232,9 +220,27 @@ export default {
       this.timeout = 3000;
 
       this.lock();
-
+      
       // Player goes first
-      this.resolveAction(damage, this.toon, this.target);
+      // check if preaching
+      if(isNaN(damage)) {
+        // damage is String input
+        var input = damage.split("").reverse().join("");
+
+      if(this.finalBattle) {
+          if(input == this.lastLine) {
+            this.target.lines.splice(this.target.lines.indexOf(this.lastLine), 1);
+          }
+      } else {
+
+        
+        if(input == this.target.name) {
+          this.hollow(this.target);
+        }
+          } 
+      } else {
+        this.resolveAction(damage, this.toon, this.target);
+      }
       this.endTurn();
 
       // then monsters
@@ -255,6 +261,14 @@ export default {
         }
 
         let rollAction = Math.floor(Math.random() * 20);
+
+        //if boss, says line
+        if(this.finalBattle && monster.lines) {
+          let rollLine = Math.floor(Math.random() * monster.lines.length-1);
+          if(rollLine<0) { rollLine = 0}
+          this.lastLine = monster.lines[rollLine];
+          this.combatLog.push(this.lastLine);
+        }
 
         let damage = 0;
         // check if  recovering
@@ -378,7 +392,11 @@ export default {
     },
     checkWin() {
       if (!this.encounter.length) {
-        this.displayText = "Victory!";
+        if(this.finalBattle) {
+          this.gameWon = true;
+        } else {
+
+          this.displayText = "Victory!";
         this.outOfCombat = true;
         this.lockMove = true;
 
@@ -387,7 +405,11 @@ export default {
 
         //reward
         this.toon.gold += this.stage * 50;
+        }
       }
+    },
+    rollCredits() {
+
     },
     hollow(victim) {
       if (victim.level) {
@@ -448,6 +470,9 @@ export default {
       // heal player
       this.toon.hp = this.toon.vigor * 10;
 
+      // voice line
+      this.combatLog.push(`<span class="yellow--text fontshadow"><b">${this.toon.name}</b> says: ` + this.toon.lines[1] + '</span>');
+
       this.seedEncounter(1, 3);
     },
     nextStage() {
@@ -460,6 +485,10 @@ export default {
       this.lockMove = false;
       this.dragonPushing = 0;
       this.ogrePushing = 0;
+
+      // voice line
+       this.combatLog.push(`<span class="yellow--text fontshadow"><b>${this.toon.name}</b> says: ` + this.toon.lines[0] + '</span>');
+      
 
       // [1/2] bossconditions
       if (this.stage >= 10) {
@@ -562,6 +591,21 @@ export default {
         this.secretMessage = "";
         this.inventory.push({name: "Falchion", ap: 35, uses: 3, maxUses: 3, cost: 225 });
         this.isSecretFalchion = false;
+      }
+    },
+        etherealHalberd() {
+      let okay = true;
+      this.inventory.forEach((weapon) => {
+        if (weapon.name == "Halberd") {
+          this.secretMessage = "Can't carry <b>two</b> of these!";
+          okay = false;
+          return;
+        }
+      });
+      if (okay) {
+        this.secretMessage = "";
+        this.inventory.push({name: "Halberd", ap: 45, uses: 99, maxUses: 99, cost: 300 });
+        this.isSecretHalberd = false;
       }
     },
 

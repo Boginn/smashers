@@ -57,8 +57,8 @@ export default {
       ],
       armor: [
         {name: "Loincloth", ac: 5, cost: 15 },
-        {name: "Chain Mail", ac: 15, cost: 100 },
-        {name: "Onion Suit", ac: 25, cost: 200 },
+        {name: "Chain Mail", ac: 15, cost: 50 },
+        {name: "Onion Suit", ac: 25, cost: 250 },
         {name: "Impenetranium Attire", ac: 75, cost: 1000 },
       ],
       items: [

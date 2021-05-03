@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Game from '../views/Game.vue'
 import Welcome from '../views/Welcome.vue'
+import Help from '../views/Help.vue'
 
 Vue.use(VueRouter)
 
@@ -17,6 +18,12 @@ const routes = [
     name: 'Welcome',
     component: Welcome
   },
+  {
+    path: '/Welcome',
+    name: 'Help',
+    component: Help
+  },
+
   // {
     // path: '/about',
     // name: 'About',

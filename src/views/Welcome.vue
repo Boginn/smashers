@@ -13,7 +13,7 @@
             <h1
               
               style="height: 50px;"
-              class="toon-title fontshadow"
+              class="fontshadow"
             >
               {{ toon.name }}
             </h1>
@@ -43,7 +43,7 @@
                             <h2
               
               style="height: 50px;"
-              class="toon-title fontshadow"
+              class="fontshadow"
             >
               {{ toon.difficulty }}
             </h2>
@@ -69,8 +69,11 @@ export default {
       message: "Pick a character:",
       characters: [
         {
+          background: "background: linear-gradient(180deg,rgba(12, 80, 92, 0.95) 0%,rgba(51, 1, 26, 0.9) 75%)",
           difficulty: "Hard",
+          lines: ['Any%!', "Therefore, dragon."],
           name: "Depraved",
+          pacifist: false,
           level: 1,
           xp: 0,
           points: 0,
@@ -85,14 +88,17 @@ export default {
           sacrifice: false,
           lust: false,
 
-          strength: 1,
-          dexterity: 1,
-          willpower: 1,
-          vigor: 1,
+          strength: 2,
+          dexterity: 4,
+          willpower: 10,
+          vigor: 3,
         },
         {
+          background: "background: linear-gradient(180deg,rgb(0, 55, 86, 0.95) 0%,rgba(0, 80, 85, 0.9) 75%)",
           difficulty: "Normal",
+          lines: ['They drew first blood!', "Of course it's a dragon!!"],
           name: "Rambo",
+          pacifist: false,
           level: 1,
           xp: 0,
           points: 0,
@@ -113,8 +119,11 @@ export default {
           vigor: 5,
         },
         {
+          background: "background: linear-gradient(180deg, rgba(0, 86, 39, 0.95) 0%, rgba(0, 27, 85, 0.9) 75%)",
           difficulty: "Interesting",
+          lines: ["Who needs weapons when you have the power of god? These creatures don't like hearing their name <b class=\"cyan--text\">sdrawkcab</b>. For bigger creatures with something to say, I might be able to use their <b class=\"cyan--text\">sdrow</b> against them!", "Not even a dragon can withstand my verses!"], 
           name: "Pharc",
+          pacifist: true,
           level: 1,
           xp: 0,
           points: 0,

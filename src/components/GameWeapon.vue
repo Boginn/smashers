@@ -1,6 +1,7 @@
 <template>
   <v-container>
-      <v-row>
+    
+      <v-row v-if="!toon.pacifist">
         <div v-for="w in inventory" v-bind:key="w.name" class="d-flex justify-center">
           <v-btn
           class="weapon"
@@ -13,6 +14,16 @@
           </v-btn>
         </div>
       </v-row>
+      <v-row v-else>
+        <img
+                style="margin-bottom: 5px;"
+              height="50px"
+              src="../assets/cross.png"
+              alt="cross"
+          />
+        <input class="fontshadow" type="text" v-model="input" placeholder="Recite...">
+        <v-btn class="yellow--text fontshadow attack-bg" height="50" block :disabled="$parent.lockMove" @click="$emit('preach', input); input = ''">PREACH</v-btn>
+      </v-row>
   </v-container>
 </template>
 
@@ -21,7 +32,17 @@ export default {
 props: {
   inventory: Array,
   selectedWeapon: Object,
+  toon: Object,
 },
+computed: {
+
+  },
+data: function() {
+  return {
+  input: '',
+
+  }
+}
 
 }
 </script>
@@ -33,5 +54,27 @@ props: {
 }
 .highlight {
   background-color: rgba(0, 255, 255, 0.281);
+}
+::placeholder { 
+  color: white;
+}
+input {
+  border-radius: 10px;
+  padding-left: 10px;
+  color: white;
+  width: 90%;
+}
+input:active,
+input:focus
+{
+outline: none;
+border: none;
+}
+.attack-bg {
+  background: linear-gradient(
+    120deg,
+    rgba(202, 189, 3, 0.95) -60%,
+    rgba(196, 54, 54, 0.95) 30%
+  );
 }
 </style>
