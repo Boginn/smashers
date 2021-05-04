@@ -755,30 +755,7 @@ export default {
   width: 30%;
 }
 
-.dragonPush {
-  position: absolute;
-  top: 10%;
-  right: 10%;
-  transition: 1;
-}
-.dragonPush2 {
-  position: absolute;
-  top: 15%;
-  right: -11%;
-  transition: 1;
-}
-.dragonPush3 {
-  position: absolute;
-  top: 18%;
-  right: -25%;
-  transition: 1;
-}
-.dragonPush4 {
-  position: absolute;
-  top: 20%;
-  right: -30%;
-  transition: 1;
-}
+
 .overflowhidden {
   overflow: hidden;
 }

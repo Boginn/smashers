@@ -99,7 +99,8 @@ export default {
     rgba(9, 20, 121, 0.8) 66%
   );
   border: 0.5px dashed white;
-  margin-top: 25px;
+  margin-top: 10px;
+
 }
 .monsterbg {
   background: linear-gradient(
